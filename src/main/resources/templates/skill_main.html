@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Skill List</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container">
+    <h1>Skill List</h1>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Item PK</th>
+            <th>User</th>
+            <th>Lrg Ctgr</th>
+            <th>Sml Ctgr</th>
+            <th>Skill Title</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="skill : ${skills}">
+            <td th:text="${skill.itemPk}"></td>
+            <td th:text="${skill.user}"></td>
+            <td th:text="${skill.lrgCtgr}"></td>
+            <td th:text="${skill.smlCtgr}"></td>
+            <td><a th:href="@{/skill/{itemPk}(itemPk=${skill.itemPk})}" th:text="${skill.skillTitle}"></a></td>
+        </tr>
+        </tbody>
+    </table>
+    <a href="/skill/new" class="btn btn-primary">Add Skill</a>
+</div>
+</body>
+</html>

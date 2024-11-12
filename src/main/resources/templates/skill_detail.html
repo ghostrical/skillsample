@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Skill Detail</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container">
+  <h1>Skill Detail</h1>
+  <p><strong>Item PK:</strong> <span th:text="${skill.itemPk}"></span></p>
+  <p><strong>User:</strong> <span th:text="${skill.user}"></span></p>
+  <p><strong>Large Category:</strong> <span th:text="${skill.lrgCtgr}"></span></p>
+  <p><strong>Small Category:</strong> <span th:text="${skill.smlCtgr}"></span></p>
+  <p><strong>Skill Title:</strong> <span th:text="${skill.skillTitle}"></span></p>
+  <p><strong>Created Date:</strong> <span th:text="${skill.createdDttm}"></span></p>
+  <p><strong>Updated Date:</strong> <span th:text="${skill.updatedDttm}"></span></p>
+  <p><strong>Skill Content:</strong> <span th:text="${skill.skillContent}"></span></p>
+
+  <a href="/skill" class="btn btn-default">Back to List</a>
+  <a th:href="@{/skill/mod/{itemPk}(itemPk=${skill.itemPk})}" class="btn btn-warning">Edit</a>
+</div>
+</body>
+</html>

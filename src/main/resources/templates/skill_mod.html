@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Edit Skill</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container">
+    <h1>Edit Skill</h1>
+    <form action="#" th:action="@{/skill/mod/{itemPk}(itemPk=${skillItemDTO.itemPk})}" th:object="${skillItemDTO}" method="POST">
+        <input type="hidden" th:field="*{itemPk}" />
+        <input type="hidden" name="_method" value="PATCH"/>
+        <div class="form-group">
+            <label for="lrgCtgr">Large Category</label>
+            <input type="text" class="form-control" id="lrgCtgr" th:field="*{lrgCtgr}" required>
+        </div>
+        <div class="form-group">
+            <label for="smlCtgr">Small Category</label>
+            <input type="text" class="form-control" id="smlCtgr" th:field="*{smlCtgr}" required>
+        </div>
+        <div class="form-group">
+            <label for="skillTitle">Skill Title</label>
+            <input type="text" class="form-control" id="skillTitle" th:field="*{skillTitle}" required>
+        </div>
+        <div class="form-group">
+            <label for="skillContent">Skill Content</label>
+            <textarea class="form-control" id="skillContent" th:field="*{skillContent}" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Save</button>
+    </form>
+</div>
+</body>
+</html>
