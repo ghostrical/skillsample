@@ -10,7 +10,7 @@ public class UserList {
 
     @Id
     private String userId;
-    private String userPassword;
+    private String userPassword; // 유령중위12!@
     private String userAuth;
 
     // Getters and Setters
