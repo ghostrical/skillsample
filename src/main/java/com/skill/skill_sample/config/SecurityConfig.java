@@ -16,6 +16,7 @@ import org.springframework.security.config.annotation.web.configurers.LogoutConf
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -39,8 +40,6 @@ public class SecurityConfig {
         this.customUserDetailsService = customUserDetailsService;
     }
 
-
-
 //    @Bean
 //    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 //        http
@@ -57,6 +56,9 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+
+        System.out.println("씨발");
+
         http
                 .authenticationManager(authenticationManager(http))
                 .formLogin(new Customizer<FormLoginConfigurer<HttpSecurity>>() {
@@ -82,24 +84,24 @@ public class SecurityConfig {
                     public void customize(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry authorizationManagerRequestMatcherRegistry) {
                         authorizationManagerRequestMatcherRegistry
                                 .requestMatchers("/login", "/css/**", "/js/**").permitAll()
-                                .requestMatchers("/skill_main").authenticated();
-//                                .anyRequest().denyAll();
+                                .requestMatchers("/skill_main").authenticated()
+                                .anyRequest().denyAll();
                     }
                 });
 
         return http.build();
     }
 
-    @Bean
-    CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("*"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PATCH", "DELETE"));
-
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-        return source;
-    }
+//    @Bean
+//    CorsConfigurationSource corsConfigurationSource() {
+//        CorsConfiguration configuration = new CorsConfiguration();
+//        configuration.setAllowedOrigins(Arrays.asList("*"));
+//        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PATCH", "DELETE"));
+//
+//        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+//        source.registerCorsConfiguration("/**", configuration);
+//        return source;
+//    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -127,5 +129,9 @@ public class SecurityConfig {
         return authenticationManagerBuilder.build();  // AuthenticationManager 반환
     }
 
+    @Bean
+    public UserDetailsService userDetailsService () {
+        return new CustomUserDetailsService();
+    }
 
 }
