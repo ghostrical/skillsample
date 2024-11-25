@@ -54,40 +54,63 @@ public class SecurityConfig {
 //        return http.build();  // http 빌드하여 리턴
 //    }
 
+//    @Bean
+//    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+//
+//        System.out.println("씨발");
+//
+//        http
+//                .formLogin(new Customizer<FormLoginConfigurer<HttpSecurity>>() {
+//                    @Override
+//                    public void customize(FormLoginConfigurer<HttpSecurity> httpSecurityFormLoginConfigurer) {
+//                        httpSecurityFormLoginConfigurer
+//                                .loginPage("/login")   // 이걸 다른 /eafaefweaw 로 하면 계속 이걸로 무한 리다이렉트한다.
+//                                .loginProcessingUrl("/login")
+//                                .defaultSuccessUrl("/skill", true)
+//                                .failureUrl("/login?error=true");
+//                    }
+//                })
+//                .authenticationManager(authenticationManager(http))
+//                .logout(new Customizer<LogoutConfigurer<HttpSecurity>>() {
+//                    @Override
+//                    public void customize(LogoutConfigurer<HttpSecurity> httpSecurityLogoutConfigurer) {
+//                        httpSecurityLogoutConfigurer
+//                                .logoutUrl("/logout")
+//                                .logoutSuccessUrl("/login");
+//                    }
+//                })
+//                .authorizeHttpRequests(new Customizer<AuthorizeHttpRequestsConfigurer<org.springframework.security.config.annotation.web.builders.HttpSecurity>.AuthorizationManagerRequestMatcherRegistry>() {
+//                    @Override
+//                    public void customize(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry authorizationManagerRequestMatcherRegistry) {
+//                        authorizationManagerRequestMatcherRegistry
+//                                .requestMatchers("/login", "/css/**", "/js/**").permitAll()
+//                                .requestMatchers("/skill_main").authenticated()
+//                                .anyRequest().denyAll();
+//                    }
+//                });
+//
+//        return http.build();
+//    }
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         System.out.println("씨발");
 
         http
+                .formLogin( form -> form
+                        .loginPage("/login")
+                        .loginProcessingUrl("/login")
+                        .defaultSuccessUrl("/skill",true)
+                        .failureUrl("/login?error=true"))
                 .authenticationManager(authenticationManager(http))
-                .formLogin(new Customizer<FormLoginConfigurer<HttpSecurity>>() {
-                    @Override
-                    public void customize(FormLoginConfigurer<HttpSecurity> httpSecurityFormLoginConfigurer) {
-                        httpSecurityFormLoginConfigurer
-                                .loginPage("/login")
-                                .loginProcessingUrl("/login")
-                                .defaultSuccessUrl("/skill_main", true)
-                                .failureUrl("/login?error=true");
-                    }
-                })
-                .logout(new Customizer<LogoutConfigurer<HttpSecurity>>() {
-                    @Override
-                    public void customize(LogoutConfigurer<HttpSecurity> httpSecurityLogoutConfigurer) {
-                        httpSecurityLogoutConfigurer
-                                .logoutUrl("/logout")
-                                .logoutSuccessUrl("/login");
-                    }
-                })
-                .authorizeHttpRequests(new Customizer<AuthorizeHttpRequestsConfigurer<org.springframework.security.config.annotation.web.builders.HttpSecurity>.AuthorizationManagerRequestMatcherRegistry>() {
-                    @Override
-                    public void customize(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry authorizationManagerRequestMatcherRegistry) {
-                        authorizationManagerRequestMatcherRegistry
-                                .requestMatchers("/login", "/css/**", "/js/**").permitAll()
-                                .requestMatchers("/skill_main").authenticated()
-                                .anyRequest().denyAll();
-                    }
-                });
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/login"))
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/login","/css/**","/js/**").permitAll()
+                        .requestMatchers("/skill").authenticated()
+                        .anyRequest().denyAll());
 
         return http.build();
     }
