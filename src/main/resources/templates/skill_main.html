@@ -28,7 +28,7 @@
         </tbody>
     </table>
     <a href="/skill/new" class="btn btn-primary">Add Skill</a>
-    <form th:action="@{/logout}" method="post" style="display:inline;"> <!-- 타임리프의 CSRF 적용은 action 에 th: 를 달아야 하고 경로에 @{경로} 처리를 해야 한다.
+    <form th:action="@{/logout}" method="post" style="display:inline;"> <!-- 타임리프의 CSRF 적용은 action 에 th: 를 달아야 하고 경로에 @{경로} 처리를 해야 한다. -->
         <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
         <button type="submit" class="btn btn-danger">Logout</button>
     </form>
