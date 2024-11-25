@@ -1,7 +1,5 @@
 package com.skill.skill_sample.config;
 
-import com.skill.skill_sample.entity.UserList;
-import com.skill.skill_sample.repository.UserRepository;
 import com.skill.skill_sample.security.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,23 +9,12 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
+import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
 import org.springframework.security.config.annotation.web.configurers.FormLoginConfigurer;
 import org.springframework.security.config.annotation.web.configurers.LogoutConfigurer;
-import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
-import java.util.Arrays;
-
-import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
 @EnableWebSecurity
@@ -35,36 +22,45 @@ public class SecurityConfig {
 
     private final CustomUserDetailsService customUserDetailsService;
 
-
     public SecurityConfig(CustomUserDetailsService customUserDetailsService) {
         this.customUserDetailsService = customUserDetailsService;
     }
 
-//    @Bean
-//    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-//        http
-//                .authorizeRequests()  // 권한 요청 설정
-//                .requestMatchers("/login", "/css/**", "/js/**").permitAll()  // 로그인과 리소스는 모두 허용
-//                .requestMatchers("/skill_main").authenticated()  // 로그인 후 /skill_main에 접근 허용
-//                .anyRequest().denyAll()  // 그 외의 모든 요청은 거부
-//                .and()
-//                .formLogin(withDefaults())  // 로그인 설정 (새로운 방식)
-//                .logout(withDefaults());    // 로그아웃 설정 (새로운 방식)
-//
-//        return http.build();  // http 빌드하여 리턴
-//    }
+    // 일단 성공소스인데 이전에 내가 했던거도 csrf 빼면 먹히는가?
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+                .formLogin(form -> form
+                        .loginPage("/login")  // 로그인 페이지 URL
+                    //    .loginProcessingUrl("/login") // 이걸 넣어도 안되는건가? 있든 없든 상관없네
+                        .defaultSuccessUrl("/skill", true)  // 로그인 성공 후 리다이렉트 URL ... 일단 이건 html이 아니라 GETMapping 요청대로 쓰는게 맞았고.. skill_main 이 아니야..
+                        .failureUrl("/login?error=true")  // 로그인 실패 후 리다이렉트 URL
+                )
+                .authenticationManager(authenticationManager(http))  // AuthenticationManager 설정
+                .logout(logout -> logout
+                        .logoutUrl("/logout")  // 로그아웃 URL
+                        .logoutSuccessUrl("/login")  // 로그아웃 후 리다이렉트 URL
+                )
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/login", "/css/**", "/js/**").permitAll()  // 로그인 페이지와 리소스는 모두 허용
+                        .requestMatchers("/skill").authenticated()  // /skill은 로그인 후 접근 가능.. 이것도 /skill_main 이 아니라 GETMapping 요청대로다.
+                        .anyRequest().denyAll()  // 나머지 요청은 모두 거부
+                )
+                .csrf(csrf -> csrf
+                        .disable());  // CSRF 비활성화 (디버깅용, 실제로는 활성화하는 것이 좋습니다).. 정말 CSRF때문에 걸린거라고? 진짜네 csrf때문에 걸린거였네.
 
+        return http.build();
+    }
+
+    // 내가 시도했던 new Customizer 방식으로 시도... 성공했다. 결국 원인은 url /skill을 /skill_main 으로 적은 것과, csrf 때문이었네.
 //    @Bean
 //    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-//
-//        System.out.println("씨발");
-//
 //        http
 //                .formLogin(new Customizer<FormLoginConfigurer<HttpSecurity>>() {
 //                    @Override
 //                    public void customize(FormLoginConfigurer<HttpSecurity> httpSecurityFormLoginConfigurer) {
 //                        httpSecurityFormLoginConfigurer
-//                                .loginPage("/login")   // 이걸 다른 /eafaefweaw 로 하면 계속 이걸로 무한 리다이렉트한다.
+//                                .loginPage("/login")
 //                                .loginProcessingUrl("/login")
 //                                .defaultSuccessUrl("/skill", true)
 //                                .failureUrl("/login?error=true");
@@ -79,52 +75,25 @@ public class SecurityConfig {
 //                                .logoutSuccessUrl("/login");
 //                    }
 //                })
-//                .authorizeHttpRequests(new Customizer<AuthorizeHttpRequestsConfigurer<org.springframework.security.config.annotation.web.builders.HttpSecurity>.AuthorizationManagerRequestMatcherRegistry>() {
+//                .authorizeHttpRequests(new Customizer<AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry>() {
 //                    @Override
 //                    public void customize(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry authorizationManagerRequestMatcherRegistry) {
 //                        authorizationManagerRequestMatcherRegistry
 //                                .requestMatchers("/login", "/css/**", "/js/**").permitAll()
-//                                .requestMatchers("/skill_main").authenticated()
+//                                .requestMatchers("/skill").authenticated()
 //                                .anyRequest().denyAll();
+//                    }
+//                })
+//                .csrf(new Customizer<CsrfConfigurer<HttpSecurity>>() {
+//                    @Override
+//                    public void customize(CsrfConfigurer<HttpSecurity> httpSecurityCsrfConfigurer) {
+//                        httpSecurityCsrfConfigurer.disable();
 //                    }
 //                });
 //
 //        return http.build();
 //    }
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-
-        System.out.println("씨발");
-
-        http
-                .formLogin( form -> form
-                        .loginPage("/login")
-                        .loginProcessingUrl("/login")
-                        .defaultSuccessUrl("/skill",true)
-                        .failureUrl("/login?error=true"))
-                .authenticationManager(authenticationManager(http))
-                .logout(logout -> logout
-                        .logoutUrl("/logout")
-                        .logoutSuccessUrl("/login"))
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login","/css/**","/js/**").permitAll()
-                        .requestMatchers("/skill").authenticated()
-                        .anyRequest().denyAll());
-
-        return http.build();
-    }
-
-//    @Bean
-//    CorsConfigurationSource corsConfigurationSource() {
-//        CorsConfiguration configuration = new CorsConfiguration();
-//        configuration.setAllowedOrigins(Arrays.asList("*"));
-//        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PATCH", "DELETE"));
-//
-//        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-//        source.registerCorsConfiguration("/**", configuration);
-//        return source;
-//    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -133,28 +102,13 @@ public class SecurityConfig {
 
     @Bean
     public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
-        // AuthenticationManagerBuilder를 HttpSecurity에서 가져옵니다.
-
-        System.out.println("이걸 타긴 하냐?");
-
         AuthenticationManagerBuilder authenticationManagerBuilder =
                 http.getSharedObject(AuthenticationManagerBuilder.class);
-
-        System.out.println("이걸 타긴 하냐?2");
 
         authenticationManagerBuilder
                 .userDetailsService(customUserDetailsService)  // UserDetailsService 설정
                 .passwordEncoder(passwordEncoder());  // 비밀번호 인코딩 설정
 
-        System.out.println("이걸 타긴 하냐?3");
-
-
-        return authenticationManagerBuilder.build();  // AuthenticationManager 반환
+        return authenticationManagerBuilder.build();
     }
-
-    @Bean
-    public UserDetailsService userDetailsService () {
-        return new CustomUserDetailsService();
-    }
-
 }
