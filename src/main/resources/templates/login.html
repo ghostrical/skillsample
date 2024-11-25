@@ -7,7 +7,7 @@
 <body>
 <div class="container">
   <h2>Login</h2>
-  <form action="/login" method="post">  <!-- /login으로 POST 요청 -->
+  <form th:action="@{/login}" method="post"> <!-- POST 방식으로 전송 -->
     <div class="form-group">
       <label for="username">User ID:</label>
       <input type="text" class="form-control" id="username" name="username" required>
@@ -16,6 +16,8 @@
       <label for="password">Password:</label>
       <input type="password" class="form-control" id="password" name="password" required>
     </div>
+    <!-- CSRF 토큰을 자동으로 추가하는 부분 -->
+    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
     <button type="submit" class="btn btn-primary">Login</button>
   </form>
 </div>

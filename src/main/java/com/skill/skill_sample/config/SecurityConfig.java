@@ -15,6 +15,7 @@ import org.springframework.security.config.annotation.web.configurers.LogoutConf
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @EnableWebSecurity
@@ -26,7 +27,7 @@ public class SecurityConfig {
         this.customUserDetailsService = customUserDetailsService;
     }
 
-    // 일단 성공소스인데 이전에 내가 했던거도 csrf 빼면 먹히는가?
+    // CSRF 활성시도함.
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -47,10 +48,13 @@ public class SecurityConfig {
                         .anyRequest().denyAll()  // 나머지 요청은 모두 거부
                 )
                 .csrf(csrf -> csrf
-                        .disable());  // CSRF 비활성화 (디버깅용, 실제로는 활성화하는 것이 좋습니다).. 정말 CSRF때문에 걸린거라고? 진짜네 csrf때문에 걸린거였네.
+                        .requireCsrfProtectionMatcher(new AntPathRequestMatcher("/logout","POST"))
+                        );
 
         return http.build();
     }
+
+
 
     // 내가 시도했던 new Customizer 방식으로 시도... 성공했다. 결국 원인은 url /skill을 /skill_main 으로 적은 것과, csrf 때문이었네.
 //    @Bean
