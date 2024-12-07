@@ -44,11 +44,12 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/login", "/css/**", "/js/**").permitAll()  // 로그인 페이지와 리소스는 모두 허용
-                        .requestMatchers("/skill").authenticated()  // /skill은 로그인 후 접근 가능.. 이것도 /skill_main 이 아니라 GETMapping 요청대로다.
+                        .requestMatchers("/skill/**").authenticated()  // /skill은 로그인 후 접근 가능.. 이것도 /skill_main 이 아니라 GETMapping 요청대로다... /skill/** 로 하면 로그인 이후 skill 하위는 허용
                         .anyRequest().denyAll()  // 나머지 요청은 모두 거부
                 )
                 .csrf(csrf -> csrf
                         .requireCsrfProtectionMatcher(new AntPathRequestMatcher("/logout","POST"))
+                        .ignoringRequestMatchers(new AntPathRequestMatcher("/**","GET"))        // GET 요청은 csrf 토큰 미처리
                         );
 
         return http.build();
