@@ -13,6 +13,8 @@ public class SkillItem {
     private String lrgCtgr;
     private String smlCtgr;
     private String skillTitle;
+
+    @Lob
     private String skillContent;
     private java.util.Date createdDttm;
     private java.util.Date updatedDttm;

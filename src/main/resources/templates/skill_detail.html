@@ -14,7 +14,7 @@
   <p><strong>Skill Title:</strong> <span th:text="${skill.skillTitle}"></span></p>
   <p><strong>Created Date:</strong> <span th:text="${skill.createdDttm}"></span></p>
   <p><strong>Updated Date:</strong> <span th:text="${skill.updatedDttm}"></span></p>
-  <p><strong>Skill Content:</strong> <span th:text="${skill.skillContent}"></span></p>
+  <p><strong>Skill Content:</strong> <span th:utext="${skill.skillContent}"></span></p>
 
   <a href="/skill" class="btn btn-default">Back to List</a>
   <a th:href="@{/skill/mod/{itemPk}(itemPk=${skill.itemPk})}" class="btn btn-warning">Edit</a>

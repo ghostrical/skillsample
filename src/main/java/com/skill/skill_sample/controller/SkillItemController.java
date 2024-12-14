@@ -46,6 +46,25 @@ public class SkillItemController {
     @GetMapping("/{itemPk}")
     public String getSkillById(@PathVariable("itemPk") int itemPk, Model model) {
         VSkillItemDTO skill = skillItemService.getSkillById(itemPk);
+
+        // 아... 이걸 컨트롤러에서 해야 하나.
+        // 혹시 탭 \t 와  개행 \n 이 데이터로 있냐?
+        System.out.println("혹시 탭 개행 있냐?");
+        if(skill.getSkillContent().contains("\t")){
+            System.out.println("탭있다.");
+        };
+
+        System.out.println("개행은 있냐?");
+        if(skill.getSkillContent().contains("\n")){
+            System.out.println("개행 있다");
+        }
+
+        // 탭 \t 을 &nbsp;&nbsp;&nbsp;&nbsp; 로 변환하고 개행 \n 을 <br> 로 변환
+        String excCt = "";
+        excCt = skill.getSkillContent().replace("\t","&nbsp;&nbsp;&nbsp;&nbsp;");
+        excCt = excCt.replace("\n","<br>");
+        skill.setSkillContent(excCt);
+
         model.addAttribute("skill", skill);
         return "skill_detail.html"; // 상세정보 뷰
     }
