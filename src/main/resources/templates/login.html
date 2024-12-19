@@ -3,15 +3,12 @@
 <head>
   <title>Login</title>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/js-sha256@0.9.0/build/sha256.min.js"></script>
+
   <script>
-    // SHA-256 해시 함수
-    async function sha256(message) {
-      const encoder = new TextEncoder();
-      const data = encoder.encode(message);
-      const hashBuffer = await crypto.subtle.digest('SHA-256', data);  // SHA-256 해시 계산
-      const hashArray = Array.from(new Uint8Array(hashBuffer));  // 버퍼를 배열로 변환
-      const hashHex = hashArray.map(byte => byte.toString(16).padStart(2, '0')).join('');  // 16진수로 변환
-      return hashHex;
+    // SHA-256 해시 함수 (js-sha256 사용)
+    function sha256Hash(message) {
+      return sha256(message);  // js-sha256 라이브러리 사용
     }
 
     // 폼 제출 전에 비밀번호 해시
@@ -20,7 +17,13 @@
 
       const passwordField = document.getElementById('password');
       const passwordValue = passwordField.value;
-      const hashedPassword = await sha256(passwordValue);  // SHA-256 해시 생성
+
+      if (!passwordValue) {
+        alert('Password is required!');
+        return;
+      }
+
+      const hashedPassword = sha256Hash(passwordValue);  // SHA-256 해시 생성
 
       passwordField.value = hashedPassword;  // 해시된 비밀번호로 덮어쓰기
 
