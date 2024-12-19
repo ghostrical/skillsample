@@ -62,7 +62,10 @@ public class SkillItemController {
         // 탭 \t 을 &nbsp;&nbsp;&nbsp;&nbsp; 로 변환하고 개행 \n 을 <br> 로 변환
         String excCt = "";
         excCt = skill.getSkillContent().replace("\t","&nbsp;&nbsp;&nbsp;&nbsp;");
+        excCt = excCt.replace("<","&lt");
+        excCt = excCt.replace(">","&gt");
         excCt = excCt.replace("\n","<br>");
+
         skill.setSkillContent(excCt);
 
         model.addAttribute("skill", skill);
